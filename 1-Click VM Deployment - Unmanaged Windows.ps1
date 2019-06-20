@@ -1,6 +1,6 @@
 
 ##########################################################################
-# This PS Script would deploy an Unmanaged VM with a specified resourceGroup & VM name without any availability set
+# This PS Script would deploy an Unmanaged VM with a specified resourceGroup & VM name
 # This file was downloaded from https://github.com/
 # Feel free to change this file to fit your needs.
 ##########################################################################
@@ -26,7 +26,7 @@ $PublisherName= "MicrosoftWindowsServer" ;   $Offer ="WindowsServer"  ; $osSKU="
 
 #Enter VM credentials
 $username = "azureadmin"
-$password = "P@sswrod1234"
+$password = "P@sswrd1234"
 $secureStringPwd = $password | ConvertTo-SecureString -AsPlainText -Force 
 $cred = new-object -typename System.Management.Automation.PSCredential -Argumentlist $username, $secureStringPwd
 
@@ -52,9 +52,9 @@ $publicIp = Get-AzureRmPublicIpAddress -Name $pip.name -ResourceGroupName $resou
 #$publicIp.DnsSettings.DomainNameLabel = "$vmname-vm"
 #Set-AzureRmPublicIpAddress -PublicIpAddress $publicIp
 
-Write-Output "Created Public DNS record for VM : $(($pip.DnsSettingsText | Out-String | ConvertFrom-Json).Fqdn)" 
+echo "Created Public DNS record for VM : $(($pip.DnsSettingsText | Out-String | ConvertFrom-Json).Fqdn)" 
 #https://stackoverflow.com/questions/16575419/powershell-retrieve-json-object-by-field-value
-Write-Output "Now please wait while deploying the new Azure VM...."
+echo "Now please wait while deploying the new Azure VM...."
 
 # Create an inbound network security group rule for port 3389
 $nsgRuleRDP = New-AzureRmNetworkSecurityRuleConfig -Name "$vmname-RDPrule$(Get-Random -maximum 100)"  -Protocol Tcp `
@@ -97,12 +97,12 @@ $vmstatus=New-AzureRmVM -ResourceGroupName $resourceGroup -Location $location -V
 
 if($vmstatus.IsSuccessStatusCode)
 { 
-    Write-Output "=================================================================================" 
-    Write-Output " successfully create VM : $vmname" 
-    Write-Output " Public DNS : $(($pip.DnsSettingsText | Out-String | ConvertFrom-Json).Fqdn)" 
-    Write-Output " username   : $username" 
+    echo "=================================================================================" 
+    echo " successfully create VM : $vmname" 
+    echo " Public DNS : $(($pip.DnsSettingsText | Out-String | ConvertFrom-Json).Fqdn)" 
+    echo " username   : $username" 
 }else{
-    Write-Output "Please resolve errors $vmstatus"
+    echo "Please resolve errors $vmstatus"
 }
 
 
