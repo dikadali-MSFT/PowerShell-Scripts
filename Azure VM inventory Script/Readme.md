@@ -1,7 +1,7 @@
 Azure IaaS VM inventory Script
 ===================================
 This PS Script would get all the inventory details for Azure VMs. 
-By default it will get inventory of all VMs in the default subscription
+By default it will get the inventory of all VMs in the default subscription
 You can optionally specify a list of VMs in the CSV format like below.
 
 name,resourceGroupName
