@@ -131,7 +131,7 @@ function get-AzVMdetails{
     
 
     
-    #.\Reports\AzureRmDataDisks_$(Get-Date -UFormat "%Y%m%d%H%M%S").csv
+    #.\Reports\AzureRmDataDisks_$(Get-Date -UFormat "%d-%m-%Y-%H.%M.%S").csv
     $VerbosePreference = "Continue"
     $StartTime = Get-Date
 
@@ -211,7 +211,7 @@ function get-AzVMdetails{
 
             $private_ip_address = $vmnic.ipconfigurations.privateipaddress
             
-<#
+<# Need to write code for multi NiC VMs
             foreach($azurenicdetails_iterator in $azurenicdetails){
                 if($azurenicdetails_iterator.id -eq $azurevmlist_iterator.networkprofile.networkinterfaces.id) {
                 #write-host $vm.networkinterfaceids
@@ -298,12 +298,12 @@ function get-AzVMdetails{
                 
             }
 
-            $vm_object | Export-Csv "vm_details.csv" -NoTypeInformation -Force 
+            $vm_object | Export-Csv "VM_Inventory_$(Get-Date -UFormat "%d-%m-%Y-%H.%M").csv" -NoTypeInformation -Force 
             #$vm_object 
 
 }
 
 
 get-AzVMdetails
-Write-Host "Task completed in $((New-TimeSpan $StartTime (Get-Date)).TotalSeconds) seconds."
+Write-Host "Task completed in $((New-TimeSpan $StartTime (Get-Date)).TotalSeconds) seconds. `r`n"
 Write-Host "Please check output CSV file under folder $path_to_store_inventory_csv_files  "
