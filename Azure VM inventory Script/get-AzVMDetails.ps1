@@ -271,8 +271,7 @@ function get-AzVMdetails{
                 $vm_object_temp | add-member -membertype NoteProperty -name "VMStatus" -Value $vm_status.Statuses[1].DisplayStatus
                 $vm_object_temp | add-member -membertype NoteProperty -name "Location" -Value $azureVMList_Iterator.Location
                 $vm_object_temp | add-member -membertype NoteProperty -name "VMSize" -Value $azureVMList_Iterator.HardwareProfile.VmSize               
-                $vm_object_temp | add-member -membertype NoteProperty -name "OSDiskName" -Value $azureVMList_Iterator.StorageProfile.OsDisk.Name
-                $vm_object_temp | add-member -membertype NoteProperty -name "OSDiskType" -Value $azureVMList_Iterator.StorageProfile.OsDisk.OsType
+                $vm_object_temp | add-member -membertype NoteProperty -name "OSType" -Value $azureVMList_Iterator.StorageProfile.OsDisk.OsType
                 $vm_object_temp | add-member -membertype NoteProperty -name "OSVersion" -Value $azureVMList_Iterator.StorageProfile.ImageReference.sku
                 $vm_object_temp | add-member -membertype NoteProperty -name "AdminUserName" -Value $azureVMList_Iterator.OSProfile.AdminUsername            
                 $vm_object_temp | add-member -membertype NoteProperty -name "vnetName" -Value $VMvNetName
@@ -281,6 +280,8 @@ function get-AzVMdetails{
                 $vm_object_temp | add-member -membertype NoteProperty -name "PublicIP" -Value $publicip.IpAddress
                 $vm_object_temp | add-member -membertype NoteProperty -name "PublicIP_FQDN" -Value $(($publicIp.DnsSettingsText | Out-String | ConvertFrom-Json).Fqdn)
                 $vm_object_temp | add-member -membertype NoteProperty -name "DiskType" -Value $disk_type
+                $vm_object_temp | add-member -membertype NoteProperty -name "OSDiskName" -Value $azureVMList_Iterator.StorageProfile.OsDisk.Name
+                $vm_object_temp | add-member -membertype NoteProperty -name "OSDiskSizeGB" -Value $azureVMList_Iterator.StorageProfile.OsDisk.DiskSizeGB
                 $vm_object_temp | add-member -membertype NoteProperty -name "OSDiskID/URI" -Value $os_disk_id
                 $vm_object_temp | add-member -membertype NoteProperty -name "DataDiskCount" -Value $data_disks.Count
                 $vm_object_temp | add-member -membertype NoteProperty -name "DataDiskNames" -Value $data_disk_name_list
@@ -305,5 +306,5 @@ function get-AzVMdetails{
 
 
 get-AzVMdetails
-Write-Host "Task completed in $((New-TimeSpan $StartTime (Get-Date)).TotalSeconds) seconds. `r`n"
-Write-Host "Please check output CSV file under folder $path_to_store_inventory_csv_files  "
+Write-Host "Task completed in $((New-TimeSpan $StartTime (Get-Date)).TotalSeconds) Seconds. `r`n"
+Write-Host "Please check output CSV file under folder $path_to_store_inventory_csv_files\VM_Inventory_$(Get-Date -UFormat "%d-%m-%Y-%H.%M").csv  "
