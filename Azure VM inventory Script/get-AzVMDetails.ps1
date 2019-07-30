@@ -127,8 +127,9 @@ if($Subscription_id){
     Select-AzSubscription -Subscription $Subscription_id;
 }
 
-function get-AzVMdetails{
-    
+function get-AzVMdetails
+{
+   
 
     
     #.\Reports\AzureRmDataDisks_$(Get-Date -UFormat "%d-%m-%Y-%H.%M.%S").csv
@@ -145,9 +146,9 @@ function get-AzVMdetails{
 
 
     
-    #####################################################################
-    #    Fetch Virtual Machine Details                               #
-    #####################################################################
+    #-------------------------------------------
+    #    Fetch Virtual Machine Details         -                      
+    #-------------------------------------------
 
         $vm_object = $null
         $vm_object = @()
@@ -156,7 +157,8 @@ function get-AzVMdetails{
 
         #Generating $azureVMList Arrary object from csv input file
  
-        if($CSV_VMList){
+        if($CSV_VMList)
+        {
             
             try{
                 Test-Path $CSV_VMList -PathType Leaf -ErrorAction Stop
@@ -180,7 +182,9 @@ function get-AzVMdetails{
             }    
             Write-Host "`r`nImported All VM from CSV file"  -ForegroundColor Green 
             
-        }else{
+        }
+        else
+        {
             
             $azureVMList=Get-AzVM
             Write-Host "`r`nImported All VM from subscription" -ForegroundColor Green 
@@ -194,7 +198,8 @@ function get-AzVMdetails{
             
             $vm_list_object = $null
             $vm_list_object = @()
-            foreach($azureVMList_Iterator in $azureVMList){
+            foreach($azureVMList_Iterator in $azureVMList)
+            {
                 
                 # Fetching the VM satus
                 $vm_status = get-azvm -ResourceGroupName $azureVMList_Iterator.resourcegroupname -name $azureVMList_Iterator.name -Status
@@ -205,7 +210,8 @@ function get-AzVMdetails{
                 $VMvNetName = $VMNic.IpConfigurations.Subnet.Id.Split("/")[8]
                 #$vNet = Get-AzVirtualNetwork -ResourceGroupName $azureVMList_Iterator.resourcegroupname -Name $VMvNetName
                 #Get Public IP details
-                if($VMNic.IpConfigurations[0].PublicIpAddress.id){
+                if($VMNic.IpConfigurations[0].PublicIpAddress.id)
+                {
                     $public_ip_address_name = $VMNic.IpConfigurations[0].PublicIpAddress.Id.split("/")[8] 
                     $publicip = get-azpublicipaddress -name $public_ip_address_name -resourcegroupname $azurevmlist_iterator.resourcegroupname -erroraction silentlycontinue
 
@@ -228,13 +234,17 @@ function get-AzVMdetails{
                 $data_disk_name_list = ""
                 $data_disk_full_list = ""
 
-                if($data_disks.Count -eq 0){
+                if($data_disks.Count -eq 0)
+                {
                             $data_disk_name_list = "No Data Disk Attached"
                             $data_disk_full_list = "No Data Disk Attached"
                             #write-host $data_disk_name_list
-                }elseif($data_disks.Count -ge 1) {
+                }
+                elseif($data_disks.Count -ge 1) 
+                {
                             
-                    foreach ($data_disks_iterator in $data_disks) {
+                    foreach ($data_disks_iterator in $data_disks) 
+                    {
                         $data_disk_full_list_temp =  $data_disk_full_list + $data_disks_iterator.name + " --- " + $data_disks_iterator.DiskSizeGB + "GB --- " + $data_disks_iterator.ManagedDisk.id + $data_disks_iterator.vhd.uri + " ; `r`n "
                         $data_disk_full_list = $data_disk_full_list_temp
                     
@@ -247,7 +257,8 @@ function get-AzVMdetails{
 
                 # Fetching OS Details (Managed / un-managed)
 
-                if($azureVMList_Iterator.StorageProfile.OsDisk.manageddisk -eq $null){
+                if($azureVMList_Iterator.StorageProfile.OsDisk.manageddisk -eq $null)
+                {
                     # This is un-managed disk. It has VHD property
 
                     $os_disk_id = $azureVMList_Iterator.StorageProfile.OsDisk.Vhd.Uri
@@ -309,4 +320,4 @@ function get-AzVMdetails{
 
 get-AzVMdetails
 Write-Host "Task completed in $((New-TimeSpan $StartTime (Get-Date)).TotalSeconds) Seconds. `r`n"
-Write-Host "Please check output CSV file under folder $path_to_store_inventory_csv_files\VM_Inventory_$(Get-Date -UFormat "%d-%m-%Y-%H.%M").csv  "
+Write-Host "Please check the output CSV file $path_to_store_inventory_csv_files\VM_Inventory_$(Get-Date -UFormat "%d-%m-%Y-%H.%M").csv  "
