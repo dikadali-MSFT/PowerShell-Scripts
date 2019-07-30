@@ -192,34 +192,36 @@ function get-AzVMdetails{
 
         # Iterating over the Virtual Machines under the subscription
             
+            $vm_list_object = $null
+            $vm_list_object = @()
             foreach($azureVMList_Iterator in $azureVMList){
-            
-            # Fetching the VM satus
-            $vm_status = get-azvm -ResourceGroupName $azureVMList_Iterator.resourcegroupname -name $azureVMList_Iterator.name -Status
+                
+                # Fetching the VM satus
+                $vm_status = get-azvm -ResourceGroupName $azureVMList_Iterator.resourcegroupname -name $azureVMList_Iterator.name -Status
 
-            #Fetching the private IP and Network details of the VM
-            $VMNicName = $azureVMList_Iterator.NetworkProfile.NetworkInterfaces.Id.Split("/")[-1] 
-            $VMNic = Get-AzNetworkInterface -ResourceGroupName $azureVMList_Iterator.resourcegroupname -Name $VMNicName
-            $VMvNetName = $VMNic.IpConfigurations.Subnet.Id.Split("/")[8]
-            #$vNet = Get-AzVirtualNetwork -ResourceGroupName $azureVMList_Iterator.resourcegroupname -Name $VMvNetName
-            #Get Public IP details
-            if($VMNic.IpConfigurations[0].PublicIpAddress.id){
-                $public_ip_address_name = $VMNic.IpConfigurations[0].PublicIpAddress.Id.split("/")[8] 
-                $publicip = get-azpublicipaddress -name $public_ip_address_name -resourcegroupname $azurevmlist_iterator.resourcegroupname -erroraction silentlycontinue
+                #Fetching the private IP and Network details of the VM
+                $VMNicName = $azureVMList_Iterator.NetworkProfile.NetworkInterfaces.Id.Split("/")[-1] 
+                $VMNic = Get-AzNetworkInterface -ResourceGroupName $azureVMList_Iterator.resourcegroupname -Name $VMNicName
+                $VMvNetName = $VMNic.IpConfigurations.Subnet.Id.Split("/")[8]
+                #$vNet = Get-AzVirtualNetwork -ResourceGroupName $azureVMList_Iterator.resourcegroupname -Name $VMvNetName
+                #Get Public IP details
+                if($VMNic.IpConfigurations[0].PublicIpAddress.id){
+                    $public_ip_address_name = $VMNic.IpConfigurations[0].PublicIpAddress.Id.split("/")[8] 
+                    $publicip = get-azpublicipaddress -name $public_ip_address_name -resourcegroupname $azurevmlist_iterator.resourcegroupname -erroraction silentlycontinue
 
-            }
-
-            $private_ip_address = $vmnic.ipconfigurations.privateipaddress
-            
-<# Need to write code for multi NiC VMs
-            foreach($azurenicdetails_iterator in $azurenicdetails){
-                if($azurenicdetails_iterator.id -eq $azurevmlist_iterator.networkprofile.networkinterfaces.id) {
-                #write-host $vm.networkinterfaceids
-                $private_ip_address = $azurenicdetails_iterator.ipconfigurations.privateipaddress
                 }
-            }
 
-  #>             
+                $private_ip_address = $vmnic.ipconfigurations.privateipaddress
+                
+    <# Need to write code for multi NiC VMs
+                foreach($azurenicdetails_iterator in $azurenicdetails){
+                    if($azurenicdetails_iterator.id -eq $azurevmlist_iterator.networkprofile.networkinterfaces.id) {
+                    #write-host $vm.networkinterfaceids
+                    $private_ip_address = $azurenicdetails_iterator.ipconfigurations.privateipaddress
+                    }
+                }
+
+    #>             
 
                 #Fetching data disk names
                 $data_disks = $azureVMList_Iterator.StorageProfile.DataDisks
@@ -264,44 +266,44 @@ function get-AzVMdetails{
                 #Fetch all VM Encryption status
                 $VMencryptionstatus=Get-AzVmDiskEncryptionStatus -ResourceGroupName $azureVMList_Iterator.ResourceGroupName -VMName $azureVMList_Iterator.name
 
+                $vm_properties = [ordered]@{    
+                                    "VMName" = $azureVMList_Iterator.Name ;
+                                    "ResourceGroupName" = $azureVMList_Iterator.ResourceGroupName;
+                                    "VMStatus" = $vm_status.Statuses[1].DisplayStatus ;
+                                    "Location" = $azureVMList_Iterator.Location ;
+                                    "VMSize" = $azureVMList_Iterator.HardwareProfile.VmSize ;             
+                                    "OSType" = $azureVMList_Iterator.StorageProfile.OsDisk.OsType ;
+                                    "OSVersion" = $azureVMList_Iterator.StorageProfile.ImageReference.sku ;
+                                    "AdminUserName" = $azureVMList_Iterator.OSProfile.AdminUsername ;          
+                                    "vnetName" = $VMvNetName ;
+                                    "NICResourceId" = $azureVMList_Iterator.NetworkProfile.NetworkInterfaces.id ;
+                                    "PrivateIP" = $private_ip_address ;
+                                    "PublicIP" = $publicip.IpAddress ;
+                                    "PublicIP_FQDN" = $(($publicIp.DnsSettingsText | Out-String | ConvertFrom-Json).Fqdn) ;
+                                    "DiskType" = $disk_type ;
+                                    "OSDiskName" = $azureVMList_Iterator.StorageProfile.OsDisk.Name ;
+                                    "OSDiskSizeGB" = $azureVMList_Iterator.StorageProfile.OsDisk.DiskSizeGB ;
+                                    "OSDiskID/URI" = $os_disk_id ;
+                                    "DataDiskCount" = $data_disks.Count ;
+                                    "DataDiskNames" = $data_disk_name_list ;
+                                    "DataDisksDetailsAll (DiskName - DiskSize - DiskURI)" = $data_disk_full_list ;
+                                    "BootDiagnosticEnabled" = $bootDiagnosticStatus ;
+                                    "BootDiagnosticsStorageAccount" = $bootDiagnosticsStorageAccount ;
+                                    "VM Tags" = ($azureVMList_Iterator.tags | ConvertTo-json) ;
+                                    "OSDiskCreateOption" = $azureVMList_Iterator.StorageProfile.OsDisk.CreateOption ;
+                                    "OSDiskCachingType" = $azureVMList_Iterator.StorageProfile.OsDisk.Caching ;
+                                    "OSDiskEncryption Status" = $VMencryptionstatus.OsVolumeEncrypted ;
+                                    "DataDiskEncryption Status" = $VMencryptionstatus.DataVolumesEncrypted ;
+                                    }
 
-                $vm_object_temp = new-object PSObject 
-                $vm_object_temp | add-member -membertype NoteProperty -name "VMName" -Value $azureVMList_Iterator.Name
-                $vm_object_temp | add-member -membertype NoteProperty -name "ResourceGroupName" -Value $azureVMList_Iterator.ResourceGroupName
-                $vm_object_temp | add-member -membertype NoteProperty -name "VMStatus" -Value $vm_status.Statuses[1].DisplayStatus
-                $vm_object_temp | add-member -membertype NoteProperty -name "Location" -Value $azureVMList_Iterator.Location
-                $vm_object_temp | add-member -membertype NoteProperty -name "VMSize" -Value $azureVMList_Iterator.HardwareProfile.VmSize               
-                $vm_object_temp | add-member -membertype NoteProperty -name "OSType" -Value $azureVMList_Iterator.StorageProfile.OsDisk.OsType
-                $vm_object_temp | add-member -membertype NoteProperty -name "OSVersion" -Value $azureVMList_Iterator.StorageProfile.ImageReference.sku
-                $vm_object_temp | add-member -membertype NoteProperty -name "AdminUserName" -Value $azureVMList_Iterator.OSProfile.AdminUsername            
-                $vm_object_temp | add-member -membertype NoteProperty -name "vnetName" -Value $VMvNetName
-                $vm_object_temp | add-member -membertype NoteProperty -name "NICResourceId" -Value $azureVMList_Iterator.NetworkProfile.NetworkInterfaces.id
-                $vm_object_temp | add-member -membertype NoteProperty -name "PrivateIP" -Value $private_ip_address
-                $vm_object_temp | add-member -membertype NoteProperty -name "PublicIP" -Value $publicip.IpAddress
-                $vm_object_temp | add-member -membertype NoteProperty -name "PublicIP_FQDN" -Value $(($publicIp.DnsSettingsText | Out-String | ConvertFrom-Json).Fqdn)
-                $vm_object_temp | add-member -membertype NoteProperty -name "DiskType" -Value $disk_type
-                $vm_object_temp | add-member -membertype NoteProperty -name "OSDiskName" -Value $azureVMList_Iterator.StorageProfile.OsDisk.Name
-                $vm_object_temp | add-member -membertype NoteProperty -name "OSDiskSizeGB" -Value $azureVMList_Iterator.StorageProfile.OsDisk.DiskSizeGB
-                $vm_object_temp | add-member -membertype NoteProperty -name "OSDiskID/URI" -Value $os_disk_id
-                $vm_object_temp | add-member -membertype NoteProperty -name "DataDiskCount" -Value $data_disks.Count
-                $vm_object_temp | add-member -membertype NoteProperty -name "DataDiskNames" -Value $data_disk_name_list
-                $vm_object_temp | add-member -membertype NoteProperty -name "DataDisksDetailsAll (DiskName - DiskSize - DiskURI)" -Value $data_disk_full_list
-                $vm_object_temp | add-member -membertype NoteProperty -name "BootDiagnosticEnabled" -Value $bootDiagnosticStatus
-                $vm_object_temp | add-member -membertype NoteProperty -name "BootDiagnosticsStorageAccount" -Value $bootDiagnosticsStorageAccount
-                $vm_object_temp | add-member -membertype NoteProperty -name "VM Tags" -Value ($azureVMList_Iterator.tags | ConvertTo-json)
-                $vm_object_temp | add-member -membertype NoteProperty -name "OSDiskCreateOption" -Value $azureVMList_Iterator.StorageProfile.OsDisk.CreateOption
-                $vm_object_temp | add-member -membertype NoteProperty -name "OSDiskCachingType" -Value $azureVMList_Iterator.StorageProfile.OsDisk.Caching
-                $vm_object_temp | add-member -membertype NoteProperty -name "OSDiskEncryption Status" -Value $VMencryptionstatus.OsVolumeEncrypted
-                $vm_object_temp | add-member -membertype NoteProperty -name "DataDiskEncryption Status" -Value $VMencryptionstatus.DataVolumesEncrypted
+                    $vm_object_temp = New-Object -TypeName PSObject -Property $vm_properties -Verbose 
+                    #Write-Output $vm_object_temp    
+                    $vm_list_object += $vm_object_temp      
 
-                $vm_object += $vm_object_temp
-
-                
             }
 
-            $vm_object | Export-Csv "VM_Inventory_$(Get-Date -UFormat "%d-%m-%Y-%H.%M").csv" -NoTypeInformation -Force 
-            #$vm_object 
-
+            $vm_list_object | Export-Csv "VM_Inventory_$(Get-Date -UFormat "%d-%m-%Y-%H.%M").csv" -NoTypeInformation -Force 
+            
 }
 
 
