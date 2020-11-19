@@ -118,7 +118,7 @@ param (
         [string]$username = 'azureadmin',                     
 
         [Parameter( Mandatory=$false)]
-        [String]$password = "P@sswrd1234",              
+        [String]$password = "Password",              
 
         [Parameter( Mandatory=$false)]
         [switch]$ReportMode,
