@@ -22,15 +22,15 @@ Specifies the list of VMs
 .PARAMETER path_to_store_inventory_csv_files
 Specifies the output of inventory files. A default location is used if none is specified.
 
-.EXAMPLE
+.EXAMPLE 1
 .\get-AzureVMDetials.ps1
 Get VM inventory for all VMs in the default subscription
 
-.EXAMPLE
+.EXAMPLE 2
 .\get-AzureVMDetials.ps1 -VMListCSVFilePath “d:\servers.txt"
 Get VM inventory for the list of VMs specified in the CSV file
 
-.EXAMPLE
+.EXAMPLE 3
 .\get-AzureVMDetials.ps1 -Subscription_id "" 
 Get VM inventory for all VMs in the specified subscription
 
