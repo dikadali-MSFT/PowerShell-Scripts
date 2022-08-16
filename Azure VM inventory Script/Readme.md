@@ -33,7 +33,12 @@ Get VM inventory for the list of VMs specified in the CSV file.
 Get VM inventory for all VMs in the specified subscription.
 
 
-Output fields
+## Sample CSV Output
+![image](https://user-images.githubusercontent.com/45972925/184833938-fdce6827-83a6-46a2-9738-fb9cc691d352.png)
+
+
+
+## Output fields
 ================
  - VMName
  - ResourceGroupName
