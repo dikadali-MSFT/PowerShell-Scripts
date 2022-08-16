@@ -39,7 +39,6 @@ Get VM inventory for all VMs in the specified subscription.
 
 
 ## Output fields
-================
  - VMName
  - ResourceGroupName
  - VMStatus
