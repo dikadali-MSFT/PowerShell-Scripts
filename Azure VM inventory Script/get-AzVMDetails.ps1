@@ -4,8 +4,8 @@ get-AzVMDetails.ps1 - Azure VM inventory Script.
 
 .DESCRIPTION 
 This PS Script would get all the inventory details for Azure VMs. 
-By default it will get inventory of all VMs in the default subscription
-You can optionally specify a list of VMs in the CSV format like below.
+By default, it will get inventory of all VMs in the default subscription.
+You can optionally specify a list of VMs in a CSV format like below.
 
 name,resourceGroupName
 vm01,rg01
@@ -27,7 +27,7 @@ Specifies the output of inventory files. A default location(d:\AzureVMInventory)
 Get VM inventory for all VMs in the default subscription
 
 .EXAMPLE 2
-.\get-AzureVMDetials.ps1 -Subscription_id "" 
+.\get-AzureVMDetials.ps1 -Subscription_id "<subid>" 
 Get VM inventory for all VMs in the specified subscription
 
 .EXAMPLE 3
@@ -41,8 +41,8 @@ Written by: Dinesh Kadali
 
 Find me on:
 
-* Github:	https://github.com/dikadali
-
+* Github:	https://github.com/dikadali-MSFT
+* Linkedin: 
 Additional Credits (code contributions and testing):
 - Saurabh D, https://github.com/saurabhdhiraj
 
